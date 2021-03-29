@@ -23,9 +23,9 @@
     <dependencies>
         <!-- 同时需要common模块和logging模块只需要引入logging模块即可 -->
         <dependency>
-            <groupId>me.zhengjie</groupId>
-            <artifactId>eladmin-logging</artifactId>
-            <version>2.4</version>
+            <groupId>com.justech</groupId>
+            <artifactId>el-logging</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <!--邮件依赖-->
