@@ -15,20 +15,25 @@
  */
 package me.zhengjie.utils;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import me.zhengjie.base.RoleSmallDto;
 import me.zhengjie.exception.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 获取当前登录的用户
+ *
  * @author Zheng Jie
  * @date 2019-01-17
  */
@@ -37,6 +42,7 @@ public class SecurityUtils {
 
     /**
      * 获取当前登录的用户
+     *
      * @return UserDetails
      */
     public static UserDetails getCurrentUser() {
@@ -68,6 +74,7 @@ public class SecurityUtils {
 
     /**
      * 获取系统用户ID
+     *
      * @return 系统用户ID
      */
     public static Long getCurrentUserId() {
@@ -77,11 +84,48 @@ public class SecurityUtils {
 
     /**
      * 获取当前用户的数据权限
+     *
      * @return /
      */
-    public static List<Long> getCurrentUserDataScope(){
+    public static List<Long> getCurrentUserDataScope() {
         UserDetails userDetails = getCurrentUser();
         JSONArray array = JSONUtil.parseArray(new JSONObject(userDetails).get("dataScopes"));
-        return JSONUtil.toList(array,Long.class);
+        return JSONUtil.toList(array, Long.class);
+    }
+
+    /**
+     * 获取当前用户角色信息
+     *
+     * @return
+     */
+    public static List<RoleSmallDto> getCurrentUserRoles() {
+        UserDetails userDetails = getCurrentUser();
+        // 获取角色权限
+        JSONArray obj = JSONUtil.parseArray(new JSONObject(new JSONObject(userDetails).get("user")).get("roles"));
+        // 为空则返回 null
+        if (ObjectUtil.isEmpty(obj)) {
+            return null;
+        }
+        return JSONUtil.toList(obj, RoleSmallDto.class);
+    }
+
+    /**
+     * 获取当前用户角色信息(仅获取权限id)
+     *
+     * @return
+     */
+    public static List<Long> getCurrentUserRoleIds() {
+        UserDetails userDetails = getCurrentUser();
+        // 获取角色权限
+        JSONArray obj = JSONUtil.parseArray(new JSONObject(new JSONObject(userDetails).get("user")).get("roles"));
+        // 为空则返回 null
+        if (ObjectUtil.isEmpty(obj)) {
+            return null;
+        }
+        // 获取权限 id 列表
+        List<RoleSmallDto> list = JSONUtil.toList(obj, RoleSmallDto.class);
+        List<Long> ids = new ArrayList<>();
+        list.forEach(roleSmallDto -> ids.add(roleSmallDto.getId()));
+        return ids;
     }
 }
